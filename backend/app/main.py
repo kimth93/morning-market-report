@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -20,6 +21,8 @@ async def lifespan(app: FastAPI):
     yield
     engine.dispose()
 
+
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(lifespan=lifespan)
 app.add_middleware(
