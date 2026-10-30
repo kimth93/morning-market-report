@@ -11,6 +11,7 @@ from app.collectors.naver_news import NaverAPIError
 from app.config import get_settings
 from app.models import NewsItem, NewsSummary
 from app.services.news_collector import collect_top_news
+from app.services.outlook import Outlook, OutlookError, generate_outlook
 from app.services.summarizer import SummaryError, summarize_and_store
 
 router = APIRouter(prefix="/api/news", tags=["news"])
@@ -69,15 +70,22 @@ def generate(request: Request) -> dict[str, Any]:
     try:
         try:
             items = collect_top_news(session, settings)
-            summaries = summarize_and_store(session, _claude_client(settings), items)
-        except (NaverAPIError, SummaryError, anthropic.APIError) as exc:
+            client = _claude_client(settings)
+            summaries = summarize_and_store(session, client, items)
+            summary_by_news_id = {summary.news_id: summary for summary in summaries}
+            outlook = generate_outlook(
+                client,
+                [(item.title, summary_by_news_id[item.id].summary_text) for item in items],
+            )
+        except (NaverAPIError, SummaryError, OutlookError, anthropic.APIError) as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
 
-        summary_by_news_id = {summary.news_id: summary for summary in summaries}
         return {
             "news_items": [
                 _serialize_with_summary(item, summary_by_news_id[item.id]) for item in items
             ],
+            "market_outlook": outlook.market_outlook,
+            "investment_points": outlook.investment_points,
             "generated_at": datetime.now(timezone.utc).isoformat(),
         }
     finally:

@@ -47,8 +47,12 @@ def test_generate_endpoint_end_to_end(monkeypatch, tmp_path):
         response = client.post("/api/news/generate")
 
     assert response.status_code == 200
-    items = response.json()["news_items"]
+    body = response.json()
+    items = body["news_items"]
     assert len(items) == 5
+    assert paragraph_count(body["market_outlook"]) == 1
+    assert len(body["investment_points"]) == 3
+    assert find_directive_phrases(body["market_outlook"] + " ".join(body["investment_points"])) == []
     for item in items:
         assert set(item) == {"title", "source", "date", "url", "summary", "hallucination_risk"}
         assert 1 <= paragraph_count(item["summary"]) <= 2
