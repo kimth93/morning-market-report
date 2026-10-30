@@ -37,10 +37,10 @@ def test_returns_items_and_sends_auth_headers_and_params(settings):
 
     assert items == [{"title": "코스피 상승"}]
     url, kwargs = calls[0]
-    assert url == "https://openapi.naver.com/v1/search/news.json"
+    assert url == "https://naverapihub.apigw.ntruss.com/search/v1/news"
     assert kwargs["headers"] == {
-        "X-Naver-Client-Id": "test-naver-id",
-        "X-Naver-Client-Secret": "test-naver-secret",
+        "X-NCP-APIGW-API-KEY-ID": "test-naver-id",
+        "X-NCP-APIGW-API-KEY": "test-naver-secret",
     }
     assert kwargs["params"] == {"query": "코스피", "display": 100, "sort": "date"}
 

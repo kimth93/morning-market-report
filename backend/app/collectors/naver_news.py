@@ -6,7 +6,7 @@ import requests
 
 from app.config import Settings
 
-NAVER_NEWS_URL = "https://openapi.naver.com/v1/search/news.json"
+NAVER_NEWS_URL = "https://naverapihub.apigw.ntruss.com/search/v1/news"
 MAX_DISPLAY = 100
 TIMEOUT_SECONDS = 10
 
@@ -30,8 +30,8 @@ def fetch_news(
 
     get = http_get or requests.get
     headers = {
-        "X-Naver-Client-Id": settings.naver_client_id,
-        "X-Naver-Client-Secret": settings.naver_client_secret,
+        "X-NCP-APIGW-API-KEY-ID": settings.naver_client_id,
+        "X-NCP-APIGW-API-KEY": settings.naver_client_secret,
     }
     params = {"query": query, "display": display, "sort": sort}
 
