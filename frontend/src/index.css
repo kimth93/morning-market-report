@@ -34,9 +34,9 @@
   --motion-fast: 150ms;
   --motion-normal: 300ms;
 
-  --elev-1: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --elev-2: 0 4px 12px rgba(0, 0, 0, 0.12);
-  --elev-3: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-elev-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-elev-2: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-elev-3: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
 html,
