@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/* 디자인 토큰: 시안(.dc.html)이 쓰는 변수 이름을 그대로 유지한다.
+   원본 colors_and_type.css를 받으면 이 블록의 값만 교체한다. */
+@theme {
+  --color-primary: #0066ff;
+  --color-primary-hover: #0052cc;
+  --color-primary-pressed: #003d99;
+  --color-primary-bg: #e6f0ff;
+  --color-primary-bg-strong: #4d94ff;
+
+  --color-label: #191f28;
+  --color-label-strong: #111827;
+  --color-label-neutral: #4e5968;
+  --color-label-alternate: #6b7684;
+  --color-label-assistive: #9ca3af;
+
+  --color-line: #e5e8eb;
+  --color-line-strong: #d1d6db;
+  --color-line-subtle: #f2f4f6;
+  --color-bg-alt: #f9fafb;
+  --color-fill-normal: #f2f4f6;
+  --color-bg-cautionary: #fff8e6;
+  --color-bg-positive: #e8f7ee;
+
+  --c-blue-70: #0050d0;
+  --c-orange-30: #ffb74d;
+  --c-green-30: #7ed9a2;
+  --c-green-50: #22c55e;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Segoe UI", Roboto, sans-serif;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decel: cubic-bezier(0, 0, 0.2, 1);
+  --motion-fast: 150ms;
+  --motion-normal: 300ms;
+
+  --elev-1: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --elev-2: 0 4px 12px rgba(0, 0, 0, 0.12);
+  --elev-3: 0 8px 24px rgba(0, 0, 0, 0.16);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-label);
+  background-color: var(--color-bg-alt);
+}
