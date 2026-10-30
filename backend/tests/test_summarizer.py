@@ -120,8 +120,18 @@ def test_summary_reports_token_usage_across_attempts():
     assert result.output_tokens == 80
 
 
+def test_news_reporting_investor_buying_is_not_a_directive():
+    text = "외국인 투자자들이 대형주를 매수하며 지수가 반등했다고 전해졌다."
+
+    assert find_directive_phrases(text) == []
+
+
+def test_explicit_buy_imperative_is_a_directive():
+    assert find_directive_phrases("지금 매수하세요") != []
+
+
 def test_detects_directive_phrases_and_counts_paragraphs():
-    assert find_directive_phrases("반드시 매수하세요") != []
+    assert find_directive_phrases("반드시 사세요") != []
     assert find_directive_phrases("주목할 만한 흐름이 보입니다") == []
     assert paragraph_count("가.\n\n나.") == 2
 
