@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.news import router as news_router
+from app.api.subscription import router as subscription_router
 from app.config import get_settings
 from app.db import init_db, make_engine, make_session_factory
 
@@ -28,6 +29,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(news_router)
+app.include_router(subscription_router)
 
 
 @app.get("/health")

@@ -44,7 +44,7 @@ export default function App() {
         <HeroSection state={state} onGenerate={handleGenerate} onRetry={handleGenerate} />
         {state.phase === "done" && state.result && <ResultsSection result={state.result} />}
         <TrustPrinciples />
-        <EmailSubscription />
+        <EmailSubscription result={state.result} />
       </main>
       <Footer />
     </div>
