@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any, Iterable
@@ -8,6 +9,8 @@ from typing import Any, Iterable
 from sqlalchemy.orm import Session
 
 from app.models import NewsItem, NewsSummary
+
+logger = logging.getLogger(__name__)
 
 MODEL = "claude-opus-5-5"
 MAX_TOKENS = 2000
@@ -44,6 +47,8 @@ class SummaryError(Exception):
 class Summary:
     text: str
     hallucination_risk: str
+    input_tokens: int = 0
+    output_tokens: int = 0
 
 
 def find_directive_phrases(text: str) -> list[str]:
@@ -56,6 +61,8 @@ def paragraph_count(text: str) -> int:
 
 def summarize_news(client: Any, item: NewsItem) -> Summary:
     problem = ""
+    input_tokens = 0
+    output_tokens = 0
     for _ in range(MAX_ATTEMPTS):
         response = client.messages.create(
             model=MODEL,
@@ -64,6 +71,9 @@ def summarize_news(client: Any, item: NewsItem) -> Summary:
             output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SUMMARY_SCHEMA}},
             messages=[{"role": "user", "content": _user_message(item)}],
         )
+        usage = getattr(response, "usage", None)
+        input_tokens += getattr(usage, "input_tokens", 0)
+        output_tokens += getattr(usage, "output_tokens", 0)
         if response.stop_reason == "refusal":
             raise SummaryError("모델이 요약을 거부했습니다")
 
@@ -78,7 +88,18 @@ def summarize_news(client: Any, item: NewsItem) -> Summary:
         if directives:
             problems.append("투자 권유 표현: " + ", ".join(directives))
         if not problems:
-            return Summary(text=summary, hallucination_risk=data["hallucination_risk"])
+            logger.info(
+                "summary model=%s input_tokens=%s output_tokens=%s",
+                MODEL,
+                input_tokens,
+                output_tokens,
+            )
+            return Summary(
+                text=summary,
+                hallucination_risk=data["hallucination_risk"],
+                input_tokens=input_tokens,
+                output_tokens=output_tokens,
+            )
         problem = "; ".join(problems)
 
     raise SummaryError(f"요약 검증 실패: {problem}")

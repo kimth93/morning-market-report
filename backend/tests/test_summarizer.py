@@ -32,6 +32,7 @@ class FakeMessages:
         return SimpleNamespace(
             stop_reason=self.stop_reason,
             content=[SimpleNamespace(type="text", text=text)],
+            usage=SimpleNamespace(input_tokens=100, output_tokens=40),
         )
 
 
@@ -107,6 +108,16 @@ def test_refusal_raises_summary_error():
 
     with pytest.raises(SummaryError):
         summarize_news(client, news())
+
+
+def test_summary_reports_token_usage_across_attempts():
+    directive = "이 주식을 사세요."
+    client = FakeClient([reply(directive), reply(GOOD_SUMMARY)])
+
+    result = summarize_news(client, news())
+
+    assert result.input_tokens == 200
+    assert result.output_tokens == 80
 
 
 def test_detects_directive_phrases_and_counts_paragraphs():

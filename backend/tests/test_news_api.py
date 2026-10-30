@@ -77,3 +77,76 @@ def test_latest_returns_five_newest_by_date(monkeypatch):
     assert response.status_code == 200
     dates = [item["date"] for item in response.json()["news_items"]]
     assert dates == ["2026-07-07", "2026-07-06", "2026-07-05", "2026-07-04", "2026-07-03"]
+
+
+def make_summary(news_id: int, text: str = "요약 한 문단.", risk: str = "low"):
+    from app.models import NewsSummary
+
+    return NewsSummary(
+        news_id=news_id,
+        summary_text=text,
+        hallucination_risk=risk,
+        generated_at=datetime(2026, 7, 8, 9, 0),
+    )
+
+
+def test_generate_returns_items_with_summary_and_risk(monkeypatch):
+    item = make_item(8)
+    item.id = 1
+
+    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
+    monkeypatch.setattr("app.api.news.collect_top_news", lambda session, settings, **kw: [item])
+    monkeypatch.setattr(
+        "app.api.news.summarize_and_store",
+        lambda session, client, items: [make_summary(1, risk="medium")],
+    )
+
+    with TestClient(app) as client:
+        response = client.post("/api/news/generate")
+
+    assert response.status_code == 200
+    body = response.json()
+    assert "generated_at" in body
+    assert body["news_items"] == [
+        {
+            "title": "기사 8",
+            "source": "한국경제",
+            "date": "2026-07-08",
+            "url": "https://www.hankyung.com/8",
+            "summary": "요약 한 문단.",
+            "hallucination_risk": "medium",
+        }
+    ]
+
+
+def test_generate_maps_naver_error_to_502(monkeypatch):
+    def fail(session, settings, **kw):
+        raise NaverAPIError("네이버 API 오류 응답: 429", status_code=429)
+
+    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
+    monkeypatch.setattr("app.api.news.collect_top_news", fail)
+
+    with TestClient(app) as client:
+        response = client.post("/api/news/generate")
+
+    assert response.status_code == 502
+
+
+def test_generate_maps_summary_error_to_502(monkeypatch):
+    from app.services.summarizer import SummaryError
+
+    item = make_item(8)
+    item.id = 1
+
+    def fail(session, client, items):
+        raise SummaryError("요약 검증 실패: 문단 수")
+
+    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
+    monkeypatch.setattr("app.api.news.collect_top_news", lambda session, settings, **kw: [item])
+    monkeypatch.setattr("app.api.news.summarize_and_store", fail)
+
+    with TestClient(app) as client:
+        response = client.post("/api/news/generate")
+
+    assert response.status_code == 502
+    assert "요약 검증 실패" in response.json()["detail"]
