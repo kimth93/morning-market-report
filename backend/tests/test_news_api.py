@@ -95,14 +95,14 @@ def test_generate_returns_items_with_summary_and_risk(monkeypatch):
     item = make_item(8)
     item.id = 1
 
-    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
-    monkeypatch.setattr("app.api.news.collect_top_news", lambda session, settings, **kw: [item])
+    monkeypatch.setattr("app.services.report.claude_client", lambda settings: None)
+    monkeypatch.setattr("app.services.report.collect_top_news", lambda session, settings, **kw: [item])
     monkeypatch.setattr(
-        "app.api.news.summarize_and_store",
+        "app.services.report.summarize_and_store",
         lambda session, client, items: [make_summary(1, risk="medium")],
     )
     monkeypatch.setattr(
-        "app.api.news.generate_outlook",
+        "app.services.report.generate_outlook",
         lambda client, inputs: Outlook(market_outlook="전망 한 문단.", investment_points=["a", "b", "c"]),
     )
 
@@ -130,8 +130,8 @@ def test_generate_maps_naver_error_to_502(monkeypatch):
     def fail(session, settings, **kw):
         raise NaverAPIError("네이버 API 오류 응답: 429", status_code=429)
 
-    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
-    monkeypatch.setattr("app.api.news.collect_top_news", fail)
+    monkeypatch.setattr("app.services.report.claude_client", lambda settings: None)
+    monkeypatch.setattr("app.services.report.collect_top_news", fail)
 
     with TestClient(app) as client:
         response = client.post("/api/news/generate")
@@ -148,9 +148,9 @@ def test_generate_maps_summary_error_to_502(monkeypatch):
     def fail(session, client, items):
         raise SummaryError("요약 검증 실패: 문단 수")
 
-    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
-    monkeypatch.setattr("app.api.news.collect_top_news", lambda session, settings, **kw: [item])
-    monkeypatch.setattr("app.api.news.summarize_and_store", fail)
+    monkeypatch.setattr("app.services.report.claude_client", lambda settings: None)
+    monkeypatch.setattr("app.services.report.collect_top_news", lambda session, settings, **kw: [item])
+    monkeypatch.setattr("app.services.report.summarize_and_store", fail)
 
     with TestClient(app) as client:
         response = client.post("/api/news/generate")
@@ -168,13 +168,13 @@ def test_generate_maps_outlook_error_to_502(monkeypatch):
     def fail(client, inputs):
         raise OutlookError("전망 검증 실패: 투자포인트 개수 2")
 
-    monkeypatch.setattr("app.api.news._claude_client", lambda settings: None)
-    monkeypatch.setattr("app.api.news.collect_top_news", lambda session, settings, **kw: [item])
+    monkeypatch.setattr("app.services.report.claude_client", lambda settings: None)
+    monkeypatch.setattr("app.services.report.collect_top_news", lambda session, settings, **kw: [item])
     monkeypatch.setattr(
-        "app.api.news.summarize_and_store",
+        "app.services.report.summarize_and_store",
         lambda session, client, items: [make_summary(1)],
     )
-    monkeypatch.setattr("app.api.news.generate_outlook", fail)
+    monkeypatch.setattr("app.services.report.generate_outlook", fail)
 
     with TestClient(app) as client:
         response = client.post("/api/news/generate")

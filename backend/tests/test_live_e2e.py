@@ -40,6 +40,12 @@ def test_full_flow_meets_reliability_checks_and_logs_usage(monkeypatch, tmp_path
     usage_lines = [r.getMessage() for r in caplog.records if "input_tokens=" in r.getMessage()]
     assert len(usage_lines) == 6
 
+    # 비용 집계: 요약 5건과 전망 1건이 api_usage에 기록되고 /api/usage에 집계되어야 한다.
+    with TestClient(app) as client:
+        usage = client.get("/api/usage", params={"period": "daily"}).json()
+    recorded_calls = sum(row["calls"] for row in usage["rows"])
+    assert recorded_calls == 6
+
     print(f"\n생성 시간: {elapsed:.1f}초")
     for finding in findings:
         print(f"[{finding.level}] {finding.message}")
