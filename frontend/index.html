@@ -8,6 +8,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Netlify Forms가 배포 시점에 폼을 감지하도록 두는 숨은 정의. 실제 제출은 EmailSubscription이 보낸다. -->
+    <form name="subscribe" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="checkbox" name="consent" value="on" />
+      <input type="text" name="bot-field" />
+    </form>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

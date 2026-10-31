@@ -1,8 +1,8 @@
-import type { GenerateResponse } from "../api/news";
+import type { Report } from "../api/news";
 import { formatDate, safeHttpUrl } from "../lib/format";
 import RiskBadge from "./RiskBadge";
 
-export default function ResultsSection({ result }: { result: GenerateResponse }) {
+export default function ResultsSection({ result }: { result: Report }) {
   const points = result.investment_points.filter(Boolean).slice(0, 3);
 
   return (

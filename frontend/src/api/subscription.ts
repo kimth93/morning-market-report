@@ -1,42 +1,32 @@
-import { ApiError, API_BASE } from "./news";
+// 구독 신청은 Netlify Forms로 보낸다. 서버 코드가 없으므로 Netlify가 폼 데이터를 받아 대시보드에 쌓는다.
+export const SUBSCRIPTION_FORM_NAME = "subscribe";
 
-export interface SignupInput {
-  email: string;
+export interface SubscriptionInput {
   name: string;
+  email: string;
+  consent: boolean;
 }
 
-export interface SignupResponse {
-  status: "success";
-  subscription_id: string;
-}
+export async function submitSubscription(input: SubscriptionInput, fetchImpl: typeof fetch = fetch): Promise<void> {
+  const body = new URLSearchParams({
+    "form-name": SUBSCRIPTION_FORM_NAME,
+    name: input.name,
+    email: input.email,
+    consent: input.consent ? "on" : "",
+    "bot-field": "",
+  });
 
-export async function signupSubscriber(
-  input: SignupInput,
-  fetchImpl: typeof fetch = fetch,
-): Promise<SignupResponse> {
   let response: Response;
   try {
-    response = await fetchImpl(`${API_BASE}/api/subscription/signup`, {
+    response = await fetchImpl("/", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(input),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
     });
   } catch {
-    throw new ApiError("백엔드 서버에 연결할 수 없습니다");
+    throw new Error("신청을 보내지 못했습니다. 잠시 후 다시 시도해 주세요");
   }
-
   if (!response.ok) {
-    throw new ApiError(await readDetail(response));
+    throw new Error("신청을 보내지 못했습니다. 잠시 후 다시 시도해 주세요");
   }
-  return (await response.json()) as SignupResponse;
-}
-
-async function readDetail(response: Response): Promise<string> {
-  try {
-    const body = (await response.json()) as { detail?: unknown };
-    if (typeof body.detail === "string") return body.detail;
-  } catch {
-    // JSON이 아니면 상태 코드로 대신한다.
-  }
-  return `HTTP ${response.status}`;
 }
