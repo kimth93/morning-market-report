@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 from dotenv import load_dotenv
 
 DEFAULT_DATABASE_URL = "sqlite:///./app.db"
 REQUIRED_KEYS = ("CLAUDE_API_KEY", "NAVER_CLIENT_ID", "NAVER_CLIENT_SECRET")
+# .env는 실행 위치(cwd)가 아니라 backend/ 디렉터리에서 찾는다.
+DEFAULT_DOTENV_PATH = Path(__file__).resolve().parent.parent / ".env"
 
 
 @dataclass(frozen=True)
@@ -17,8 +20,8 @@ class Settings:
     database_url: str
 
 
-def get_settings(dotenv_path: str | None = None) -> Settings:
-    load_dotenv(dotenv_path)
+def get_settings(dotenv_path: str | Path | None = None) -> Settings:
+    load_dotenv(dotenv_path or DEFAULT_DOTENV_PATH)
 
     missing = [key for key in REQUIRED_KEYS if not os.environ.get(key)]
     if missing:
