@@ -9,6 +9,7 @@ from typing import Any, Iterable
 from sqlalchemy.orm import Session
 
 from app.models import NewsItem, NewsSummary
+from app.services.usage import record_usage
 
 logger = logging.getLogger(__name__)
 
@@ -130,6 +131,13 @@ def summarize_and_store(session: Session, client: Any, items: Iterable[NewsItem]
             continue
 
         summary = summarize_news(client, item)
+        record_usage(
+            session,
+            kind="summary",
+            model=MODEL,
+            input_tokens=summary.input_tokens,
+            output_tokens=summary.output_tokens,
+        )
         row = NewsSummary(
             news_id=item.id,
             summary_text=summary.text,

@@ -12,7 +12,9 @@ from app.config import get_settings
 from app.models import NewsItem, NewsSummary
 from app.services.news_collector import collect_top_news
 from app.services.outlook import Outlook, OutlookError, generate_outlook
+from app.services.outlook import MODEL as OUTLOOK_MODEL
 from app.services.summarizer import SummaryError, summarize_and_store
+from app.services.usage import record_usage
 
 router = APIRouter(prefix="/api/news", tags=["news"])
 LATEST_LIMIT = 5
@@ -79,6 +81,15 @@ def generate(request: Request) -> dict[str, Any]:
             )
         except (NaverAPIError, SummaryError, OutlookError, anthropic.APIError) as exc:
             raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+        record_usage(
+            session,
+            kind="outlook",
+            model=OUTLOOK_MODEL,
+            input_tokens=outlook.input_tokens,
+            output_tokens=outlook.output_tokens,
+        )
+        session.commit()
 
         return {
             "news_items": [

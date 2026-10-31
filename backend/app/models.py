@@ -38,3 +38,14 @@ class EmailSubscriber(Base):
     email: Mapped[str]
     name: Mapped[str]
     subscribed_at: Mapped[dt.datetime]
+
+
+class ApiUsage(Base):
+    __tablename__ = "api_usage"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    kind: Mapped[str]
+    model: Mapped[str]
+    input_tokens: Mapped[int]
+    output_tokens: Mapped[int]
+    created_at: Mapped[dt.datetime]
