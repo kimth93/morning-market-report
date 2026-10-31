@@ -14,7 +14,7 @@ from app.config import get_settings
 from app.db import init_db, make_engine, make_session_factory
 from app.services.report import generate_report
 
-SOURCE_NOTE = "개발자가 생성한 예시 보고서입니다. 실시간 생성 결과가 아닙니다."
+SOURCE_NOTE = "개발자가 생성한 예시 보고서입니다. 기능 구현은 완료했으나 비용 문제로 실제 생성은 제한했습니다."
 DEFAULT_OUT = Path(__file__).resolve().parent.parent.parent.parent / "frontend" / "public" / "report.json"
 
 
