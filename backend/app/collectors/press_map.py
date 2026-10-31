@@ -26,10 +26,4 @@ PRESS_BY_DOMAIN: dict[str, str] = {
     "etnews.com": "전자신문",
     "dt.co.kr": "디지털타임스",
     "ajunews.com": "아주경제",
-    "pinpointnews.co.kr": "핀포인트뉴스",
-    "autodaily.co.kr": "오토데일리",
-    "tokenpost.kr": "토큰포스트",
-    "theviewers.co.kr": "더뷰어스",
-    "megaeconomy.co.kr": "메가경제",
-    "ttlnews.com": "티티엘뉴스",
 }
