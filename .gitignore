@@ -46,3 +46,8 @@ ENV/
 
 # Playwright
 .playwright/
+
+# 발송 도구의 입력과 기록: 신청자 개인정보이므로 저장소에 올리지 않는다
+backend/outbox/
+**/submissions*.csv
+**/approved*.txt

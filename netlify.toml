@@ -1,0 +1,8 @@
+# 정적 PoC 배포 설정. 서버 함수는 두지 않는다 (Claude/네이버 호출이 공개 사이트에서 일어나지 않도록).
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
