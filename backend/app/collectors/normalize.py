@@ -26,7 +26,10 @@ def to_kst_date(value: datetime) -> date:
 
 
 def press_name(url: str) -> str:
-    domain = urlparse(url).hostname or ""
-    if domain.startswith("www."):
-        domain = domain[len("www."):]
-    return PRESS_BY_DOMAIN.get(domain, domain)
+    host = urlparse(url).hostname or ""
+    if host.startswith("www."):
+        host = host[len("www."):]
+    matches = [d for d in PRESS_BY_DOMAIN if host == d or host.endswith("." + d)]
+    if not matches:
+        return host
+    return PRESS_BY_DOMAIN[max(matches, key=len)]

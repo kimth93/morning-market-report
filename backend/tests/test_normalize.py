@@ -41,3 +41,25 @@ def test_press_name_maps_known_domain_ignoring_www():
 
 def test_press_name_falls_back_to_domain_when_unknown():
     assert press_name("https://www.unknown-site.example/news/1") == "unknown-site.example"
+
+
+def test_press_name_matches_subdomain_of_known_outlet():
+    assert press_name("https://news.einfomax.co.kr/news/articleView.html?idxno=1") == "연합인포맥스"
+
+
+def test_press_name_prefers_most_specific_domain():
+    assert press_name("https://biz.chosun.com/international/1") == "조선비즈"
+    assert press_name("https://www.chosun.com/economy/1") == "조선일보"
+
+
+def test_press_name_does_not_match_lookalike_domain():
+    assert press_name("https://notmk.co.kr/x") == "notmk.co.kr"
+
+
+def test_press_map_entries_are_clean_domains_and_names():
+    from app.collectors.press_map import PRESS_BY_DOMAIN
+
+    assert len(PRESS_BY_DOMAIN) >= 20
+    for domain, name in PRESS_BY_DOMAIN.items():
+        assert "/" not in domain and not domain.startswith("www.")
+        assert name.strip() == name and name
