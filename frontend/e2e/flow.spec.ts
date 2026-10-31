@@ -35,7 +35,32 @@ test("shows the disclaimer and the sample report without any generate button", a
   await expect(page.getByRole("heading", { name: "오늘의 시장 전망" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 3 })).toHaveCount(5);
   await expect(page.getByRole("link", { name: "원문 보기" })).toHaveCount(5);
-  await expect(page.getByRole("button", { name: "지금 생성하기" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "지금 생성하기" })).toBeVisible();
+});
+
+test("지금 생성 replays the saved sample without calling any paid API", async ({ page }) => {
+  let reportLoads = 0;
+  await page.route("**/report.json", async (route: Route) => {
+    reportLoads += 1;
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(report) });
+  });
+  // 유료 API 경로로 나가는 요청이 있으면 실패해야 한다.
+  let externalCalls = 0;
+  await page.route(/api\.anthropic\.com|naverapihub|127\.0\.0\.1:8000/, async (route: Route) => {
+    externalCalls += 1;
+    await route.abort();
+  });
+  await page.goto("/");
+  const initialLoads = reportLoads;
+
+  await page.getByRole("button", { name: "지금 생성하기" }).click();
+  await expect(page.getByRole("status")).toContainText("수집하고 있습니다");
+  await expect(page.getByRole("button", { name: "재생 중" })).toBeDisabled();
+
+  await expect(page.getByRole("heading", { name: "오늘의 시장 전망" })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("button", { name: "지금 생성하기" })).toBeVisible();
+  expect(reportLoads).toBeGreaterThan(initialLoads);
+  expect(externalCalls).toBe(0);
 });
 
 test("shows a readable error when the sample report is missing", async ({ page }) => {
@@ -45,7 +70,7 @@ test("shows a readable error when the sample report is missing", async ({ page }
   await expect(page.getByRole("alert")).toContainText("보고서를 불러오지 못했습니다");
 });
 
-test("subscribing requires consent and then shows the review message", async ({ page }) => {
+test("the signup button stays disabled until consent is checked", async ({ page }) => {
   await mockReport(page);
   let posted: URLSearchParams | null = null;
   await page.route("**/", async (route: Route) => {
@@ -59,11 +84,11 @@ test("subscribing requires consent and then shows the review message", async ({ 
   await page.getByRole("textbox", { name: "이메일 주소", exact: true }).fill("reader@example.com");
   const consent = page.getByRole("checkbox");
   await expect(consent).not.toBeChecked();
-  await page.getByRole("button", { name: "신청하기" }).click();
-  // 동의하지 않으면 브라우저 검증에 막혀 제출되지 않는다.
-  await expect(page.getByRole("status")).toHaveCount(0);
+  // 동의 전에는 신청 버튼이 비활성화되어 있어야 한다.
+  await expect(page.getByRole("button", { name: "신청하기" })).toBeDisabled();
 
   await consent.check();
+  await expect(page.getByRole("button", { name: "신청하기" })).toBeEnabled();
   await page.getByRole("button", { name: "신청하기" }).click();
   await expect(page.getByRole("status")).toContainText("신청이 접수되었습니다");
   expect(posted?.get("form-name")).toBe("subscribe");

@@ -29,7 +29,7 @@ export default function EmailSubscription() {
       <div className="rounded-2xl border border-line bg-white p-6 shadow-elev-1">
         <h2 className="text-xl font-bold text-label-strong">매일 아침 이메일로 받아보기 (신청)</h2>
         <p className="mt-1 text-sm text-label-neutral">
-          이 기능은 포트폴리오 PoC입니다. 신청은 접수만 되며, 개발자가 확인해 승인한 주소에만 발송됩니다. 실제 발송은
+          이 기능은 PoC입니다. 신청은 접수만 되며, 개발자가 확인해 승인한 주소에만 발송됩니다. 실제 발송은
           아직 시작되지 않았습니다.
         </p>
 
@@ -72,7 +72,7 @@ export default function EmailSubscription() {
           </label>
           <button
             type="submit"
-            disabled={status.kind === "submitting"}
+            disabled={!consent || status.kind === "submitting"}
             className="rounded-xl bg-primary px-5 py-3 font-semibold text-white hover:bg-primary-hover disabled:cursor-not-allowed disabled:bg-primary-bg-strong"
           >
             {status.kind === "submitting" ? "신청 중" : "신청하기"}
