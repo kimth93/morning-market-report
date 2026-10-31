@@ -1,6 +1,6 @@
 # 뉴스 요약 API 및 저장
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 부모 이슈
 

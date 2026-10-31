@@ -1,6 +1,6 @@
 # 백엔드 기초 & 데이터베이스 설정
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 구축할 내용
 

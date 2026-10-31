@@ -1,6 +1,6 @@
 # 웹 UI - 뉴스 표시 & 시장 전망
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 부모 이슈
 

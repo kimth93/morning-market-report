@@ -1,6 +1,6 @@
 # 이메일 구독 폼 & 미리보기
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 구축할 내용
 

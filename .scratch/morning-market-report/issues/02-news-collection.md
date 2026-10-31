@@ -1,6 +1,6 @@
 # 뉴스 수집 파이프라인
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 부모 이슈
 

@@ -1,6 +1,6 @@
 # Claude 요약 + 신뢰성 제어
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 부모 이슈
 

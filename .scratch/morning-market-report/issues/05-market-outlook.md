@@ -1,6 +1,6 @@
 # 시장 전망 & 투자포인트 생성
 
-Status: ready-for-agent
+Status: done (2026-10-31)
 
 ## 부모 이슈
 

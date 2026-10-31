@@ -13,9 +13,9 @@
 ## Global Constraints
 
 - 백엔드는 Python + FastAPI, DB는 SQLite, 네이버 호출은 `requests`, 환경 변수는 `python-dotenv` (PRD §1).
-- 뉴스 수집 소스는 네이버 뉴스 검색 API `https://openapi.naver.com/v1/search/news.json`만 사용한다 (이번 결정).
+- 뉴스 수집 소스는 네이버 뉴스 검색 API `https://naverapihub.apigw.ntruss.com/search/v1/news`만 사용한다 (NAVER API HUB, 2026-10-30 변경).
 - 네이버 요청 파라미터 한도: `display` 최대 100, `start` 최대 1000, `sort`는 `date` 또는 `sim`.
-- 네이버 인증은 헤더 `X-Naver-Client-Id`, `X-Naver-Client-Secret`. 환경 변수는 `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`.
+- 네이버 인증은 헤더 `X-NCP-APIGW-API-KEY-ID`, `X-NCP-APIGW-API-KEY`. 환경 변수는 `NAVER_CLIENT_ID`, `NAVER_CLIENT_SECRET`(이름 유지, 값은 NCP 키).
 - 키 값은 저장소에 커밋하지 않는다. `.env`는 이미 `.gitignore`에 있다.
 - 기사 본문은 저장하지 않는다. 저장 대상은 제목, 언론사, 발행일, 원문 링크, 네이버 제공 요약(description)뿐이다.
 - 테스트는 네트워크 호출 없이 통과해야 한다. 실제 네이버 호출 테스트는 `live` 마커로 분리하고 기본 실행에서 제외한다.
@@ -238,7 +238,7 @@ git commit -m "feat(backend): add news normalization helpers"
 - Produces:
   - `class NaverAPIError(Exception)`: 속성 `status_code: int | None`, `message: str`
   - `fetch_news(query: str, settings: Settings, display: int = 100, sort: str = "date", http_get: Callable | None = None) -> list[dict]`: 네이버 응답의 `items` 배열을 그대로 돌려준다. `http_get`은 테스트용 주입점이며 기본값은 `requests.get`이다.
-  - 호출 URL은 `https://openapi.naver.com/v1/search/news.json`, 타임아웃은 10초다.
+  - 호출 URL은 `https://naverapihub.apigw.ntruss.com/search/v1/news`, 타임아웃은 10초다.
 
 - [ ] **Step 1: 실패하는 테스트 작성**
 
